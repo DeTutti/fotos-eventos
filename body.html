@@ -1,0 +1,41 @@
+<body class="bg-gray-100 min-h-screen">
+  <nav class="bg-blue-600 text-white p-4 shadow-lg">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold">💎 FotoEventos</h1>
+      <div class="flex space-x-4">
+        <button onclick="showTab('admin')" class="px-4 py-2 rounded hover:bg-blue-700 transition">
+          <i class="fas fa-cog mr-2"></i>Administrar
+        </button>
+        <button onclick="showTab('viewer')" class="px-4 py-2 rounded hover:bg-blue-700 transition">
+          <i class="fas fa-images mr-2"></i>Galería
+        </button>
+        <button onclick="showTab('upload')" class="px-4 py-2 rounded hover:bg-blue-700 transition">
+          <i class="fas fa-qrcode mr-2"></i>QR
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mx-auto p-4">
+    <!-- Panel de Administración -->
+    <div id="admin" class="tab-content bg-white rounded-lg shadow-md p-6 mb-6 active">
+      <!-- Contenido simplificado -->
+      <h2 class="text-2xl font-bold mb-6 text-blue-800">Administración</h2>
+      <div class="space-y-4">
+        <input type="text" id="eventName" class="w-full p-2 border rounded" placeholder="Nombre del Evento">
+        <button onclick="saveEventSettings()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full">
+          Guardar
+        </button>
+      </div>
+    </div>
+
+    <!-- Galería -->
+    <div id="viewer" class="tab-content">
+      <div id="photoGallery" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
+    </div>
+
+    <!-- QR -->
+    <div id="upload" class="tab-content">
+      <div id="qrCodeContainer" class="bg-white p-4 rounded border border-gray-200"></div>
+    </div>
+  </div>
