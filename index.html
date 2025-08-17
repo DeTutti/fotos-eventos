@@ -3,17 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Foto Eventos</title>
+  <title>FotoEventos | Galería Compartida</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3B82F6',
+            secondary: '#8B5CF6',
+            accent: '#EC4899',
+            dark: '#1F2937',
+            light: '#F3F4F6'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-light min-h-screen">
+  <!-- El contenido se carga dinámicamente -->
+  <div id="app" class="container mx-auto px-4 py-8"></div>
+
+  <!-- Notificación flotante -->
+  <div id="toast" class="hidden fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-xl z-50"></div>
+
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://unpkg.com/qrcode-generator@1.4.4/qrcode.js"></script>
-  <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
-  <style>
-    .photo-card { transition: all 0.3s ease; animation: fadeIn 0.5s; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-    #qrCodeContainer canvas { width: 100% !important; height: auto !important; }
-  </style>
-</head>
+  <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+  <script src="app.js"></script>
+  <script src="ui.js"></script>
+  <script src="cloudinary.js"></script>
+</body>
+</html>
