@@ -1,32 +1,81 @@
-<script>
-  // Configuración mínima viable
-  const setupCloudinary = {
-    cloudName: 'TU_CLOUD_NAME', // Reemplazar esto
-    uploadPreset: 'event_photos'
-  };
+// Configuración personalizable - Edita estos valores
+const CONFIG = {
+  appName: "FotoEventos",
+  colors: {
+    primary: "#3B82F6",
+    secondary: "#8B5CF6",
+    accent: "#EC4899"
+  },
+  defaultEvent: {
+    name: "Mi Evento Especial",
+    date: new Date().toISOString().split('T')[0]
+  }
+};
 
-  function showTab(tabId) {
-    document.querySelectorAll('.tab-content').forEach(tab => {
-      tab.classList.remove('active');
-    });
-    document.getElementById(tabId).classList.add('active');
+class PhotoEvent {
+  constructor() {
+    this.currentEvent = {...CONFIG.defaultEvent};
+    this.photos = [];
+    this.init();
   }
 
-  function generateQRCode() {
-    const qr = qrcode(0, 'L');
-    qr.addData(window.location.href);
-    qr.make();
-    document.getElementById('qrCodeContainer').innerHTML = qr.createImgTag(4);
+  init() {
+    this.loadFromLocalStorage();
+    this.setupEventListeners();
+    this.renderUI();
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    generateQRCode();
-    const uploadButton = cloudinary.createUploadWidget(
-      setupCloudinary,
-      (error, result) => console.log(result)
-    );
-    document.getElementById('upload_widget').onclick = uploadButton.open;
-  });
-</script>
-</body>
-</html>
+  loadFromLocalStorage() {
+    const savedEvent = localStorage.getItem('photoEvent');
+    if (savedEvent) this.currentEvent = JSON.parse(savedEvent);
+
+    const savedPhotos = localStorage.getItem('eventPhotos');
+    if (savedPhotos) this.photos = JSON.parse(savedPhotos);
+  }
+
+  saveToLocalStorage() {
+    localStorage.setItem('photoEvent', JSON.stringify(this.currentEvent));
+    localStorage.setItem('eventPhotos', JSON.stringify(this.photos));
+  }
+
+  addPhoto(photoUrl) {
+    const newPhoto = {
+      id: Date.now(),
+      url: photoUrl,
+      timestamp: new Date().toISOString()
+    };
+    this.photos.unshift(newPhoto);
+    this.saveToLocalStorage();
+    this.renderUI();
+    showToast('Nueva foto agregada!');
+  }
+
+  deletePhoto(photoId) {
+    this.photos = this.photos.filter(photo => photo.id !== photoId);
+    this.saveToLocalStorage();
+    this.renderUI();
+  }
+
+  clearAllPhotos() {
+    this.photos = [];
+    this.saveToLocalStorage();
+    this.renderUI();
+  }
+
+  updateEventSettings(newSettings) {
+    this.currentEvent = {...this.currentEvent, ...newSettings};
+    this.saveToLocalStorage();
+    this.renderUI();
+    showToast('Configuración actualizada');
+  }
+
+  setupEventListeners() {
+    // Implementar en UI.js
+  }
+
+  renderUI() {
+    // Implementar en UI.js
+  }
+}
+
+const photoEventApp = new PhotoEvent();
