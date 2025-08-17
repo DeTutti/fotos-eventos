@@ -1,107 +1,60 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Subir Fotos al Evento</title>
-  <!-- Importamos el SDK de Google Picker -->
-  <script src="https://apis.google.com/js/api.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      text-align: center;
-    }
-    #uploadBtn {
-      background: #4285F4;
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      font-size: 16px;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-top: 20px;
-    }
-    #photoPreview {
-      margin-top: 20px;
-    }
-    #photoPreview img {
-      max-width: 100%;
-      border-radius: 8px;
-    }
-  </style>
+    <title>Subir Fotos al Evento</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; }
+        #preview { max-width: 100%; margin-top: 20px; display: none; }
+        button { background: #4285F4; color: white; border: none; padding: 10px 20px; cursor: pointer; }
+    </style>
 </head>
 <body>
-  <h1>Sube tu foto al evento</h1>
-  <p>Las fotos aparecerán automáticamente en la pantalla principal.</p>
-  
-  <!-- Botón para abrir el selector de Google Drive -->
-  <button id="uploadBtn">
-    <i class="fas fa-cloud-upload-alt"></i> Seleccionar Foto de Google Drive
-  </button>
+    <h1>Sube tu foto al evento</h1>
+    <input type="file" id="foto" accept="image/*">
+    <button onclick="subirFoto()">Subir Foto</button>
+    <img id="preview">
+    <p id="mensaje"></p>
 
-  <div id="photoPreview"></div>
+    <script>
+        async function subirFoto() {
+            const file = document.getElementById('foto').files[0];
+            if (!file) {
+                alert("¡Selecciona una foto primero!");
+                return;
+            }
 
-  <script>
-    // Carga el SDK de Google Picker
-    function loadPicker() {
-      gapi.load('picker', { callback: onPickerApiLoad });
-    }
-
-    // Inicializa el Picker una vez cargado
-    function onPickerApiLoad() {
-      document.getElementById('uploadBtn').addEventListener('click', function() {
-        // Autenticación con Google (usando OAuth 2.0)
-        const auth = gapi.auth2.getAuthInstance();
-        if (!auth) {
-          gapi.auth2.init({
-            client_id: 'TU_CLIENT_ID.apps.googleusercontent.com',
-            scope: 'https://www.googleapis.com/auth/drive.file'
-          }).then(function() {
-            showPicker();
-          });
-        } else {
-          showPicker();
+            const mensaje = document.getElementById('mensaje');
+            mensaje.textContent = "Subiendo...";
+            
+            // Convertir la foto a base64
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const base64Data = e.target.result.split(',')[1];
+                
+                try {
+                    // Usamos un servicio intermedio (no requiere backend propio)
+                    const response = await fetch("https://script.google.com/macros/s/AKfycbzX7JbkWXHkU6JZ7JZ7JZ7JZ7JZ7JZ7JZ7JZ7JZ7JZ7JZ7JZ7JZ7JZ7/exec", {
+                        method: "POST",
+                        body: JSON.stringify({
+                            nombre: `foto_${Date.now()}.jpg`,
+                            datos: base64Data
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    if (result.exito) {
+                        mensaje.textContent = "¡Foto subida con éxito!";
+                        document.getElementById('preview').src = `https://drive.google.com/thumbnail?id=${result.id}&sz=w500`;
+                        document.getElementById('preview').style.display = "block";
+                    } else {
+                        mensaje.textContent = "Error: " + result.error;
+                    }
+                } catch (error) {
+                    mensaje.textContent = "Error al subir: " + error.message;
+                }
+            };
+            reader.readAsDataURL(file);
         }
-      });
-    }
-
-    // Muestra el selector de archivos de Google Drive
-    function showPicker() {
-      const auth = gapi.auth2.getAuthInstance();
-      const oauthToken = auth.currentUser.get().getAuthResponse().access_token;
-      
-      const picker = new google.picker.PickerBuilder()
-        .addView(google.picker.ViewId.DOCS_IMAGES)
-        .setOAuthToken(oauthToken)
-        .setDeveloperKey('TU_API_KEY')  // Reemplaza con tu API Key
-        .setCallback(pickerCallback)
-        .build();
-      
-      picker.setVisible(true);
-    }
-
-    // Callback cuando se selecciona una foto
-    function pickerCallback(data) {
-      if (data[google.picker.Response.ACTION] === google.picker.Action.PICKED) {
-        const fileId = data[google.picker.Response.DOCUMENTS][0].id;
-        const previewUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
-        
-        // Muestra la vista previa
-        document.getElementById('photoPreview').innerHTML = `
-          <img src="${previewUrl}" alt="Vista previa de la foto subida">
-          <p>¡Foto seleccionada correctamente! Se agregará a la galería.</p>
-        `;
-        
-        // Aquí puedes agregar código para guardar el fileId en tu base de datos
-        console.log("ID del archivo en Drive:", fileId);
-      }
-    }
-
-    // Cargamos el SDK al iniciar la página
-    window.onload = loadPicker;
-  </script>
+    </script>
 </body>
 </html>
